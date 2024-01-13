@@ -200,6 +200,8 @@ pub struct CommandDataGram {
     messageid    : u32, 
     #[getset(set = "pub", get_copy = "pub")]
     returncode   : ReturnCode,
+    #[getset(set = "pub", get_copy = "pub")]
+    datasize     : u32, 
 }
 
 impl CommandDataGram {
@@ -234,6 +236,7 @@ impl CommandDataGram {
         #[allow(unused_mut)]
         let mut data_gram_ref: &mut CommandDataGram = get_mut_gram_by_u8::<CommandDataGram>(grambuf);//unsafe {&mut *(grambuf[0..].as_mut_ptr() as *mut DataGram)};
         // 设置结构体标志
+        data_gram_ref.datasize = (grambuf.len() - size_of_align_data_gram::<CommandDataGram>()) as u32;
         data_gram_ref.set_bitcomm(BitcommFlag::BITCOMM_COMMAND);
         data_gram_ref.set_version(BitcommVersion::BITCOMM_VERSION_0_1_0_1);
         data_gram_ref       
@@ -243,12 +246,18 @@ impl CommandDataGram {
         // CommandDataGram::get_command_data_gram_by_u8(slice)
     // }
     pub fn get_size() -> usize {
-        size_of_align_data_gram::<CommandDataGram>()
+        size_of_align_data_gram::<Self>()
     }
-    pub fn create_gram_buf<'a>() -> Vec<u8> {
+    // pub fn create_gram_buf<'a>() -> Vec<u8> {
+    //     // 创建一个指定大小的 Vec<u8>
+    //     #[allow(unused_mut)]
+    //     let mut vec_u8: Vec<u8> = vec![0x00; size_of_align_data_gram::<CommandDataGram>()];
+    //     vec_u8
+    // }
+    pub fn create_gram_buf<'a>(datasize: usize) -> Vec<u8> {
         // 创建一个指定大小的 Vec<u8>
         #[allow(unused_mut)]
-        let mut vec_u8: Vec<u8> = vec![0x00; size_of_align_data_gram::<CommandDataGram>()];
+        let mut vec_u8: Vec<u8> = vec![0x00; datasize + size_of_align_data_gram::<CommandDataGram>()];
         vec_u8
     }
     pub fn create_command_gram_from_message_gram<'a>(buf:&'a mut [u8],value:&'a CommandDataGram) -> &'a mut CommandDataGram {
