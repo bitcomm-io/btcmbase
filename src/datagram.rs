@@ -259,7 +259,7 @@ impl CommandDataGram {
     // }
     pub fn create_gram_buf<'a>(datasize: usize) -> Vec<u8> {
         // 创建一个指定大小的 Vec<u8>
-        #[allow(unused_mut)]
+        #[allow(unused_mut)] 
         let mut vec_u8: Vec<u8> = vec![0x00; datasize + size_of_align_data_gram::<CommandDataGram>()];
         vec_u8
     }
