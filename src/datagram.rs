@@ -35,8 +35,10 @@ bitflags!{
     #[repr(C)]   // 与C语言兼容
     #[derive(Debug,Clone,Copy,PartialEq,Eq)]
     pub struct BitCommand:u32 {
-        const SEND_RESP_MASK = 0x80000000;
-        const SEND_MESS      = 0x00000001;
+        const LOGIN_COMMAND  = 0x00000001;  // 登录命令
+        const LOGOUT_COMMAND = 0x00000002;  // 登出命令
+        const RESP_MASK      = 0x80000000;
+        const SEND_MESS      = 0x00000004;
     }
 }
 bitflags!{
@@ -173,8 +175,9 @@ impl MessageDataGram {
             );
         }
         message.set_bitcomm(value.bitcomm());
-        message.set_command(value.command() | BitCommand::SEND_RESP_MASK);
+        message.set_command(value.command() | BitCommand::RESP_MASK);
         message.set_datasize(0);
+
         message
     }
 }
@@ -188,8 +191,8 @@ pub struct CommandDataGram {
     version      : BitcommVersion, 
     #[getset(set = "pub", get_copy = "pub")]
     command      : BitCommand,
-    // #[getset(set = "pub", get_copy = "pub")]
-    // splanet      : ClientPlanet, 
+    #[getset(set = "pub", get_copy = "pub")]
+    deviceid     : u64, 
     #[getset(set = "pub", get_copy = "pub")]
     sender       : ClientID, 
     #[getset(set = "pub", get_copy = "pub")]
@@ -270,7 +273,7 @@ impl CommandDataGram {
             );
         }
         command.set_bitcomm(value.bitcomm());
-        command.set_command(value.command() | BitCommand::SEND_RESP_MASK);
+        command.set_command(value.command() | BitCommand::RESP_MASK);
         command
     }
 }

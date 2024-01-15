@@ -9,7 +9,11 @@ pub struct ClientID {
     #[getset(set = "pub", get_copy = "pub")]
     object   :   u32,
 }
-
+impl Into<u64> for ClientID {
+    fn into(self) -> u64 {
+        ((self.planet.bits() as u64) << 32) | (self.object as u64)
+    }
+}
 impl ClientID {
     pub fn new(planet: ClientPlanet, object: u32) -> Self { Self { planet, object } }
     pub fn get_guid(&self) -> u64 {
