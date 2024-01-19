@@ -1,7 +1,11 @@
 use bitflags::bitflags;
+// use bytes::BytesMut;
 use getset::{Getters,Setters,CopyGetters};
+// use std::cell::RefCell;
 use std::error;
 use std::fmt;
+use std::rc::Rc;
+use bytes::Bytes;
 use crate::client::ClientID;
 use crate::client::ClientType;
 
@@ -20,6 +24,7 @@ bitflags!{
     pub struct BitcommFlag:u32 {
         const BITCOMM_MESSAGE    =   0x4D435442;
         const BITCOMM_COMMAND    =   0x43435442;
+        const BITCOMM_NODEF      =   0xFFFFFFFF;
     }
 }
 
@@ -278,73 +283,24 @@ impl CommandDataGram {
     }
 }
 
-
-#[derive(Debug,Clone,Copy,CopyGetters, Setters)]
-pub struct BitcommDataGram<'a>{
-    #[getset(set = "pub", get_copy = "pub")]
-    bitcomm         : BitcommFlag, 
-
-    #[getset(set = "pub", get_copy = "pub")]
-    req_cmdgram     : Option<&'a CommandDataGram>,
-    #[getset(set = "pub", get_copy = "pub")]
-    req_cmdu8       : Option<&'a [u8]>,
-    #[getset(set = "pub", get_copy = "pub")]
-    res_cmdgram     : Option<&'a CommandDataGram>,
-    #[getset(set = "pub", get_copy = "pub")]
-    res_cmdu8       : Option<&'a [u8]>,
-
-    #[getset(set = "pub", get_copy = "pub")]
-    req_msggram     : Option<&'a MessageDataGram>,
-    #[getset(set = "pub", get_copy = "pub")]
-    req_msgu8       : Option<&'a [u8]>,
-    #[getset(set = "pub", get_copy = "pub")]
-    res_msggram     : Option<&'a MessageDataGram>,
-    #[getset(set = "pub", get_copy = "pub")]
-    res_msgu8       : Option<&'a[u8]>,
+#[derive(Debug)]
+pub enum InnerDataGram {
+    Command {reqcmdbuff:Rc<Bytes>,reqcmdgram:Rc<CommandDataGram>},//rescmdbuff:RefCell<BytesMut>,rescmdgram:RefCell<CommandDataGram>},
+    Message {reqmsgbuff:Rc<Bytes>,reqmsggram:Rc<MessageDataGram>} //,resmsgbuff:RefCell<BytesMut>,resmsggram:RefCell<MessageDataGram>},
 }
-
-impl <'a>BitcommDataGram<'a> {
-    pub fn new_command_data_gram(reqcmd:Option<&'a CommandDataGram>,
-                                reqcmdu8: Option<&'a [u8]>,
-                                rescmd:Option<&'a CommandDataGram>,
-                                rescmdu8: Option<&'a [u8]>,) 
-                                -> BitcommDataGram<'a> {
-        BitcommDataGram{bitcomm:BitcommFlag::BITCOMM_COMMAND,
-                        req_cmdgram:reqcmd,
-                        req_cmdu8:reqcmdu8,
-                        res_cmdgram:rescmd,
-                        res_cmdu8:rescmdu8,
-
-                        req_msggram:None,
-                        req_msgu8:None,
-                        res_msggram:None,
-                        res_msgu8:None}
-    }
-    pub fn new_message_data_gram(reqmsg:Option<&'a MessageDataGram>,
-                                reqmsgu8:Option<&'a [u8]>,
-                                resmsg:Option<&'a MessageDataGram>,
-                                resmsgu8:Option<&'a [u8]>) 
-                                -> BitcommDataGram<'a> {
-        BitcommDataGram{bitcomm:BitcommFlag::BITCOMM_MESSAGE,
-                        req_cmdgram:None,
-                        req_cmdu8:None,
-                        res_cmdgram:None,
-                        res_cmdu8:None,
-
-                        req_msggram:reqmsg,
-                        req_msgu8:reqmsgu8,
-                        res_msggram:resmsg,
-                        res_msgu8:resmsgu8}
-    }
-}
-
 
 #[derive(Debug,Getters, Setters)]
 pub struct DataGramError {
     #[getset(set = "pub", get = "pub")]
-    pub errcode: u32,
+    errcode: u32,
     #[getset(set = "pub", get = "pub")]
-    pub details: String,
+    details: String,
+}
+
+impl DataGramError {
+    pub fn new(code:u32,tails:&str) -> Self {
+        DataGramError{errcode:code,details:String::from(tails)}
+    }
 }
 
 // 为自定义错误类型实现 Display 和 Error trait
