@@ -4,7 +4,8 @@ use getset::{Getters,Setters,CopyGetters};
 // use std::cell::RefCell;
 use std::error;
 use std::fmt;
-use std::rc::Rc;
+// use std::rc::Rc;
+use std::sync::Arc;
 use bytes::Bytes;
 use crate::client::ClientID;
 use crate::client::ClientType;
@@ -268,7 +269,7 @@ impl CommandDataGram {
         let mut vec_u8: Vec<u8> = vec![0x00; datasize + size_of_align_data_gram::<CommandDataGram>()];
         vec_u8
     }
-    pub fn create_command_gram_from_message_gram<'a>(buf:&'a mut [u8],value:&'a CommandDataGram) -> &'a mut CommandDataGram {
+    pub fn create_command_gram_from_gram<'a>(buf:&'a mut [u8],value:&'a CommandDataGram) -> &'a mut CommandDataGram {
         let command = Self::create_command_data_gram_by_mut_u8(buf);
         unsafe {
             std::ptr::copy_nonoverlapping(
@@ -285,8 +286,8 @@ impl CommandDataGram {
 
 #[derive(Debug)]
 pub enum InnerDataGram {
-    Command {reqcmdbuff:Rc<Bytes>,reqcmdgram:Rc<CommandDataGram>},//rescmdbuff:RefCell<BytesMut>,rescmdgram:RefCell<CommandDataGram>},
-    Message {reqmsgbuff:Rc<Bytes>,reqmsggram:Rc<MessageDataGram>} //,resmsgbuff:RefCell<BytesMut>,resmsggram:RefCell<MessageDataGram>},
+    Command {reqcmdbuff:Arc<Bytes>,reqcmdgram:Arc<CommandDataGram>},//rescmdbuff:RefCell<BytesMut>,rescmdgram:RefCell<CommandDataGram>},
+    Message {reqmsgbuff:Arc<Bytes>,reqmsggram:Arc<MessageDataGram>} //,resmsgbuff:RefCell<BytesMut>,resmsggram:RefCell<MessageDataGram>},
 }
 
 #[derive(Debug,Getters, Setters)]
