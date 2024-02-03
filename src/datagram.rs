@@ -285,7 +285,7 @@ impl CommandDataGram {
 }
 
 #[derive(Debug)]
-pub enum InnerDataGram {
+pub enum InnerDataGram { 
     Command {reqcmdbuff:Arc<Bytes>,reqcmdgram:Arc<CommandDataGram>},//rescmdbuff:RefCell<BytesMut>,rescmdgram:RefCell<CommandDataGram>},
     Message {reqmsgbuff:Arc<Bytes>,reqmsggram:Arc<MessageDataGram>} //,resmsgbuff:RefCell<BytesMut>,resmsggram:RefCell<MessageDataGram>},
 }
