@@ -94,6 +94,7 @@ pub struct MessageDataGram {
     #[getset(set = "pub", get_copy = "pub")]
     command      : BitCommand, 
     
+    deviceid     : u32, 
     // #[getset(set = "pub", get_copy = "pub")]
     // splanet      : ClientPlanet, 
     #[getset(set = "pub", get_copy = "pub")]
@@ -198,7 +199,7 @@ pub struct CommandDataGram {
     #[getset(set = "pub", get_copy = "pub")]
     command      : BitCommand,
     #[getset(set = "pub", get_copy = "pub")]
-    deviceid     : u64, 
+    deviceid     : u32, 
     #[getset(set = "pub", get_copy = "pub")]
     sender       : ClientID, 
     #[getset(set = "pub", get_copy = "pub")]
