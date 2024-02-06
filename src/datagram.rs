@@ -93,7 +93,7 @@ pub struct MessageDataGram {
     version      : BitcommVersion, 
     #[getset(set = "pub", get_copy = "pub")]
     command      : BitCommand, 
-    
+    #[getset(set = "pub", get_copy = "pub")]
     deviceid     : u32, 
     // #[getset(set = "pub", get_copy = "pub")]
     // splanet      : ClientPlanet, 
@@ -130,6 +130,12 @@ pub struct MessageDataGram {
 impl MessageDataGram {
     // pub const BITCOMM_MESSAGE : u32  = 0x4D435442; // BTCM // 消息报文
 
+    pub fn copy_data2tail(&self,srcdata:&[u8],desdata:&mut [u8]) {
+        let beginindex = self.datasize as usize;
+        let endindex = desdata.len();
+        desdata[beginindex..endindex].copy_from_slice(srcdata);
+    }
+
     pub fn get_size() -> usize {
         size_of_align_data_gram::<Self>()
     }
@@ -145,6 +151,15 @@ impl MessageDataGram {
         // 将字节数组转换为u32
         let value = u32::from_le_bytes(bytes);
         value == BitcommFlag::BITCOMM_MESSAGE.bits()
+    }
+    pub fn create_gram_databuf<'a>(source:&[u8]) -> Vec<u8> {
+        // 创建一个指定大小的 Vec<u8>
+        #[allow(unused_mut)]
+        let mdlen = size_of_align_data_gram::<MessageDataGram>();
+        let mut vec_u8: Vec<u8> = vec![0x00; source.len() + mdlen];
+        vec_u8[mdlen..mdlen + source.len()].copy_from_slice(source);
+        // vec_u8[mdlen..mdlen+datas.len()].copy_from_slice(datas);
+        vec_u8
     }
 
     pub fn create_gram_buf<'a>(datasize: usize) -> Vec<u8> {
