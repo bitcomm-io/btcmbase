@@ -301,7 +301,7 @@ impl CommandDataGram {
 
     pub fn create_command_gram_from_message_gram<'a>(buf:&'a mut [u8],value:&'a MessageDataGram) -> &'a mut CommandDataGram {
         let command = Self::create_command_data_gram_by_mut_u8(buf);
-        command.set_bitcomm(value.bitcomm());
+        command.set_bitcomm(BitcommFlag::BITCOMM_COMMAND);
         command.set_command(value.command() | BitCommand::RESP_MASK);
         command.set_sender(value.sender);
         command.set_sendertype(value.sendertype());
