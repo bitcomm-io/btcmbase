@@ -14,8 +14,9 @@ bitflags!{
     #[repr(C)]   // 与C语言兼容
     #[derive(Debug,Clone,Copy,PartialEq,Eq)]
     pub struct ReturnCode:u32 {
-        const RETURN_OK     =   0x00000000;
-        const RETURN_ERROR1 =   0x00000001;
+        const RETURN_OK                     =   0x00000000;
+        const RETURN_NOT_LOGIN              =   0x00000001;
+        const RETURN_TWO_SESSION_NO_SAME    =   0x00000002;
     }
 }
 

@@ -15,12 +15,20 @@ impl Into<u64> for ClientID {
     } 
 }
 impl ClientID {
+    // 
     pub fn new(planet: ClientPlanet, object: u32) -> Self { Self { planet, object } }
+    //
     pub fn get_guid(&self) -> u64 {
         ((self.planet.bits() as u64) << 32) | (self.object as u64)
     }
+    //
     pub fn get_hex(&self) -> String {
         format!("{:x}", self.get_guid())
+    }
+    //
+    pub fn get_key(&self,deviceid:u32) -> u128 {
+        let num_u64 = ((self.planet.bits() as u64) << 32) | (self.object as u64);
+        (num_u64 as u128) << 64 | (deviceid as u128)
     }
 }
 
