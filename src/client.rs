@@ -50,3 +50,25 @@ bitflags!{
         const PLANET_MAR      = 0x00010002;
     }
 }
+#[repr(C)] 
+#[derive(Debug,Clone,Copy,CopyGetters, Setters,PartialEq,Eq)]
+pub struct DeviceConnInfo {
+    #[getset(set = "pub", get_copy = "pub")]
+    device_id       :u32,
+    #[getset(set = "pub", get_copy = "pub")]
+    device_state    :DeviceConnState,
+}
+impl DeviceConnInfo {
+  pub fn new(device_id:u32,device_state:DeviceConnState) -> Self {
+    Self{device_id,device_state}
+  }
+}
+bitflags!{
+    #[repr(C)]   // 与C语言兼容
+    #[derive(Debug,Clone,Copy,PartialEq,Eq)]
+    pub struct DeviceConnState:u32 {
+        const STATE_ONLINE    = 0x00010001;
+        const STATE_ONBACK    = 0x00010002;
+        const STATE_OFFLINE   = 0x00010004;
+    }
+}
