@@ -42,10 +42,13 @@ bitflags!{
     #[repr(C)]   // 与C语言兼容
     #[derive(Debug,Clone,Copy,PartialEq,Eq)]
     pub struct BitCommand:u32 {
+        const RESP_MASK      = 0x80000000;  // 回复的消息
         const LOGIN_COMMAND  = 0x00000001;  // 登录命令
         const LOGOUT_COMMAND = 0x00000002;  // 登出命令
-        const RESP_MASK      = 0x80000000;
-        const SEND_MESS      = 0x00000004;
+        const SEND_MESS      = 0x00000004;  // 发送信息
+        const SEND_PING      = 0x10000000;  // 返回PING
+        const RESP_PONG      = Self::SEND_PING.bits() | Self::RESP_MASK.bits();  // 返回PONG
+
     }
 }
 bitflags!{
