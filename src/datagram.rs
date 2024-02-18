@@ -24,8 +24,10 @@ bitflags!{
     #[repr(C)]   // 与C语言兼容
     #[derive(Debug,Clone,Copy,PartialEq,Eq)]
     pub struct BitcommFlag:u32 {
-        const BITCOMM_MESSAGE    =   0x4D435442;
-        const BITCOMM_COMMAND    =   0x43435442;
+        const BITCOMM_MESSAGE    =   0x4D435442; // BTCM
+        const BITCOMM_COMMAND    =   0x43435442; // BTCC
+        const BITCOMM_PING       =   0x49505442; // BTPI
+        const BITCOMM_PONG       =   0x4F505442; // BTPO
         const BITCOMM_NODEF      =   0xFFFFFFFF;
     }
 }
@@ -236,6 +238,18 @@ pub struct CommandDataGram {
 impl CommandDataGram {
     // pub const BITCOMM_COMMAND : u32  = 0x43435442; // BTCC // 命令报文
 
+    pub fn is_bitcomm_flag(datas: &[u8]) -> bool {
+        datas.len() == std::mem::size_of::<BitcommFlag>()
+    }
+
+    pub fn get_bitcomm_flag_by_u8<'a>(grambuf:&'a [u8]) -> &'a BitcommFlag {
+        #[allow(unused_mut)]
+        let bitcomm_flag_ref: &BitcommFlag = get_gram_by_u8::<BitcommFlag>(grambuf);//unsafe {& *(grambuf[0..].as_ptr() as *const DataGramHead)};
+        // 设置结构体下,缓冲区的大小
+        // data_gram_ref.datasize = (grambuf.len() - size_of_align_data_gram()) as u32;
+        bitcomm_flag_ref       
+    }
+
     pub fn is_command_from_bytes(datas:&[u8]) -> bool {
         if datas.len() == Self::get_size() {
             Self::is_command(datas)
@@ -320,7 +334,8 @@ impl CommandDataGram {
 #[derive(Debug)]
 pub enum InnerDataGram { 
     Command {reqcmdbuff:Arc<Bytes>,reqcmdgram:Arc<CommandDataGram>},//rescmdbuff:RefCell<BytesMut>,rescmdgram:RefCell<CommandDataGram>},
-    Message {reqmsgbuff:Arc<Bytes>,reqmsggram:Arc<MessageDataGram>} //,resmsgbuff:RefCell<BytesMut>,resmsggram:RefCell<MessageDataGram>},
+    Message {reqmsgbuff:Arc<Bytes>,reqmsggram:Arc<MessageDataGram>}, //,resmsgbuff:RefCell<BytesMut>,resmsggram:RefCell<MessageDataGram>},
+    Pingpong(Arc<BitcommFlag>),
 }
 
 #[derive(Debug,Getters, Setters)]
