@@ -1,7 +1,7 @@
 use bitflags::bitflags;
 use getset::{ Setters, CopyGetters };
 
-#[repr(C)] // 与C语言兼容
+#[repr(C)] // 与C语言兼容c
 #[derive(Debug, Clone, Copy, CopyGetters, Setters,PartialEq,Eq)]
 pub struct ClientID {
     #[getset(set = "pub", get_copy = "pub")]
